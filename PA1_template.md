@@ -12,41 +12,8 @@ output:
 ```r
 #load the libraries
 library(tidyverse)
-```
-
-```
-## ── Attaching packages ──────────────────────────────────────────────────────────── tidyverse 1.3.1 ──
-```
-
-```
-## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
-## ✔ tibble  3.1.7     ✔ dplyr   1.0.9
-## ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-## ✔ readr   2.1.2     ✔ forcats 0.5.1
-```
-
-```
-## ── Conflicts ─────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-```
-
-```r
 library(gridExtra)
-```
 
-```
-## 
-## Attaching package: 'gridExtra'
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     combine
-```
-
-```r
 options(scipen=999)
 #load the data
 activitydata <- read_csv("activity.zip")
@@ -54,9 +21,6 @@ activitydata <- read_csv("activity.zip")
 
 ```
 ## Rows: 17568 Columns: 3
-```
-
-```
 ## ── Column specification ─────────────────────────────────────────────────────────────────────────────
 ## Delimiter: ","
 ## dbl  (2): steps, interval
@@ -107,7 +71,9 @@ The mean and median values are close in value ignoring the NA values:
 
 
 ```r
-intervalgroup <- na.omit(activitydata) %>% group_by(interval) %>% summarize(total = sum(steps))
+intervalgroup <- na.omit(activitydata) %>% group_by(interval) %>% summarize(total = mean(steps))
+
+                                                                          
 
 #----------Find the max average interval------------------------
 maxpoint <- intervalgroup[which.max(intervalgroup$total),]
@@ -121,8 +87,8 @@ p3 <- ggplot(intervalgroup, aes(interval, total)) +
                    cex = 2) +
         geom_label(data=maxpoint, 
                    aes(label = paste("Max Value = ", 
-                                     total, "steps at interval", 
-                                     interval)), nudge_y = 600) +
+                                     round(total,1), "steps at interval", 
+                                     interval)), nudge_y = 15) +
         labs(title = "Average Steps/ Time Interval", 
              x = "Time Interval", 
              y = "# of Steps") +
@@ -212,7 +178,7 @@ The mean value is a little lower and the median value dropped more significantly
 
 ```r
 p5data <-  filter(imputeddata, daytype == "Weekday") %>% 
-        group_by(interval) %>% summarize(total = sum(steps))
+        group_by(interval) %>% summarize(total = mean(steps))
         
     p5 <-    ggplot(p5data, aes(interval, total)) +
         geom_line() +
@@ -222,14 +188,13 @@ p5data <-  filter(imputeddata, daytype == "Weekday") %>%
         theme_minimal()
 
 p6data <-  filter(imputeddata, daytype == "Weekend") %>% 
-        group_by(interval) %>% summarize(total = sum(steps))        
+        group_by(interval) %>% summarize(total = mean(steps))        
         
 p6 <- ggplot(p6data, aes(interval, total)) +
         geom_line() +
         labs(title = "Average Steps during Weekend Days", 
              x = "Time Interval", 
              y = "# of Steps") +
-        ylim(0,10500) +
         theme_minimal()
 
 grid.arrange(p5, p6, ncol = 1)
@@ -239,4 +204,4 @@ grid.arrange(p5, p6, ncol = 1)
   
   
   
-  The plots clearly show that weekend activity is significantly lower than weekday activity.
+  The plots show that weekend activity is more consistent throughout the day than weekdays activity.
